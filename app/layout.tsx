@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'AI Quiz Mini App',
   description: 'Generate and play quizzes on any topic with AI',
+  other: {
+    'base:app_id': '6971838e8ffff7b10d18723c',
+  },
   openGraph: {
     title: 'AI Quiz Mini App',
     description: 'Generate and play quizzes on any topic with AI',

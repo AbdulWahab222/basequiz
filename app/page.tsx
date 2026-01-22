@@ -28,6 +28,8 @@ export default function Home() {
   const [score, setScore] = useState(0)
   const [savedQuizzes, setSavedQuizzes] = useState<Quiz[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(300) // 5 minutes in seconds
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
 
   // Load saved quizzes from localStorage on mount
   useEffect(() => {
@@ -43,6 +45,27 @@ export default function Home() {
       localStorage.setItem('savedQuizzes', JSON.stringify(savedQuizzes))
     }
   }, [savedQuizzes])
+
+  // Timer countdown effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+
+    if (isTimerRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1)
+      }, 1000)
+    } else if (timeLeft === 0) {
+      // Time's up - calculate score and show results
+      setIsTimerRunning(false)
+      if (quizState === 'quiz') {
+        calculateScore()
+      }
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isTimerRunning, timeLeft, quizState])
 
   // Generate quiz questions based on topic using Ollama
   const generateQuiz = async () => {
@@ -79,6 +102,8 @@ export default function Home() {
       setCurrentQuestionIndex(0)
       setSelectedAnswers([])
       setScore(0)
+      setTimeLeft(300) // Reset timer to 5 minutes
+      setIsTimerRunning(true)
       setQuizState('quiz')
     } catch (error) {
       console.error('Error generating quiz:', error)
@@ -116,6 +141,7 @@ export default function Home() {
       }
     })
     setScore(correct)
+    setIsTimerRunning(false) // Stop the timer
     setQuizState('result')
   }
 
@@ -123,6 +149,8 @@ export default function Home() {
     setCurrentQuestionIndex(0)
     setSelectedAnswers([])
     setScore(0)
+    setTimeLeft(300) // Reset timer to 5 minutes
+    setIsTimerRunning(true)
     setQuizState('quiz')
   }
 
@@ -132,6 +160,7 @@ export default function Home() {
     setCurrentQuestionIndex(0)
     setSelectedAnswers([])
     setScore(0)
+    setIsTimerRunning(false) // Stop the timer
     setQuizState('home')
   }
 
@@ -146,6 +175,8 @@ export default function Home() {
     setCurrentQuestionIndex(0)
     setSelectedAnswers([])
     setScore(0)
+    setTimeLeft(300) // Reset timer to 5 minutes
+    setIsTimerRunning(true)
     setQuizState('quiz')
   }
 
@@ -278,6 +309,24 @@ export default function Home() {
                     width: `${((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100}%`
                   }}
                 />
+              </div>
+            </div>
+
+            {/* Timer Display */}
+            <div className={`bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border-2 ${
+              timeLeft <= 60 ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+            }`}>
+              <div className="flex items-center justify-center gap-3">
+                <span className={`text-2xl font-bold ${
+                  timeLeft <= 60 ? 'text-red-600' : 'text-gray-700 dark:text-gray-300'
+                }`}>
+                  ⏱️ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+                </span>
+                {timeLeft <= 60 && (
+                  <span className="text-sm text-red-600 font-semibold animate-pulse">
+                    Hurry up!
+                  </span>
+                )}
               </div>
             </div>
 
