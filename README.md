@@ -94,29 +94,23 @@ quiz-mini-app/
 
 ## 🌐 Deploy to Vercel
 
-### Option 1: Vercel CLI
+### ⚠️ Important Note About Ollama Integration
 
-1. **Install Vercel CLI:**
-```bash
-npm i -g vercel
-```
+**This app uses local Ollama for AI-powered quiz generation.** When deployed to Vercel, the app will **NOT** have access to your local Ollama instance because:
 
-2. **Deploy:**
-```bash
-vercel
-```
+1. Vercel runs in the cloud, not on your local machine
+2. The API route tries to connect to `localhost:11434`, which doesn't exist on Vercel
+3. Vercel doesn't have Ollama installed
 
-### Option 2: Vercel Dashboard (Recommended)
+### Deployment Options
 
-1. **Push to GitHub:**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/quiz-mini-app.git
-git push -u origin main
-```
+#### Option 1: Deploy as a Static Demo (Quiz Generation Disabled)
+
+If you want to deploy to Vercel for demonstration purposes, the app will still work but quiz generation will fail. Users can only play with saved quizzes.
+
+**Steps:**
+1. **Push to GitHub** (already done!)
+   - Repository: https://github.com/AbdulWahab222/basequiz
 
 2. **Deploy on Vercel:**
    - Go to [vercel.com](https://vercel.com)
@@ -124,7 +118,41 @@ git push -u origin main
    - Import your GitHub repository
    - Click "Deploy"
 
-Your app will be live at `https://your-quiz-name.vercel.app`
+Your app will be live at `https://basequiz.vercel.app`
+
+#### Option 2: Deploy with a Cloud AI API (Full Functionality)
+
+To enable quiz generation on Vercel, you need to use a cloud-based AI API instead of local Ollama:
+
+1. **Get an API key** from one of these providers:
+   - [OpenAI](https://platform.openai.com/api-keys) - GPT-4, GPT-3.5
+   - [Anthropic](https://console.anthropic.com/) - Claude 3
+   - [Groq](https://console.groq.com/) - Fast Llama/Mistral inference
+   - [Together AI](https://api.together.xyz/) - Multiple open-source models
+
+2. **Update the API route** in [`app/api/generate-quiz/route.ts`](app/api/generate-quiz/route.ts):
+   - Replace the Ollama fetch call with your chosen API
+   - Add your API key to environment variables
+
+3. **Deploy to Vercel** with the new API integration
+
+#### Option 3: Self-Host with Ollama (Full Functionality)
+
+For full functionality with Ollama, you need to self-host the app:
+
+1. **Deploy to a VPS** (e.g., DigitalOcean, AWS EC2, Railway)
+2. **Install Ollama** on the server
+3. **Run the app** with Ollama running alongside it
+4. **Set up a reverse proxy** (nginx) for HTTPS
+
+### Vercel CLI Deployment
+
+If you still want to deploy to Vercel (for demo purposes):
+
+```bash
+npm i -g vercel
+vercel
+```
 
 ## 🔧 Configuration
 
